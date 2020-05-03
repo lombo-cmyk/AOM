@@ -9,13 +9,7 @@ function BranchAndBound(f, A, b, LB, UB)
         return;
     end
     if isempty(results) || fval < min([results{:,2}])
-        if any(newLB ~= LB)
-            BranchAndBound(f, A, b, newLB, UB);
-        end
-        if any(newUB ~= UB)
-            BranchAndBound(f, A, b, LB, newUB);
-        end
-    else
-        return;
+        BranchAndBound(f, A, b, newLB, UB);
+        BranchAndBound(f, A, b, LB, newUB);
     end
 end

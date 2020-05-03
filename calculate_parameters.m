@@ -1,5 +1,6 @@
 function [A_new, b_new] = calculate_parameters(loop_iter, i, costraint, A_old, b_old)
-    temp = [0 0 0];
+    %temp = [0 0 0];
+    temp = zeros(1,length(A_old(1,:)))
     if loop_iter == 1
         temp(i)=1;
         b_new = [b_old; costraint(1)];

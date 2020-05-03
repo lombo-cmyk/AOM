@@ -5,7 +5,7 @@ function [Xopt, Zopt, constraints, i] = linprog_new_constraints(Z,A,B)
     if isempty(Xopt)
         return
     end
-    for i = 1:3
+    for i = 1:length(Xopt)
         if abs(round(Xopt(i))-Xopt(i))>0.00001
         constraints = [floor(Xopt(i)) ceil(Xopt(i))];
         break

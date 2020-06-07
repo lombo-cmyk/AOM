@@ -1,4 +1,6 @@
 from linearquadratic import LinearQuadraticProblem as LQP
+
+
 def main():
     problem = LQP()
     problem.calculate_k()

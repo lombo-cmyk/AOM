@@ -3,37 +3,43 @@ import numpy as np
 
 class LinearQuadraticProblem:
 
-    def __init__(self):
-        self.n, self.r = 1, 1
-        self.N = 20
-        self.i = 20
-        self.F = 0
-        self.Q = np.array([[9, -18], [-18, 36]])
-        self.A = np.array([[1, 0], [0, 3]])
-        self.K = np.zeros((self.A.shape[0], self.A.shape[0], self.N))
-        self.B = np.array([[1], [2]])
-        self.R = 15
-        self.dupa = np.zeros((2, 1, self.N))
-        self.dupa[:, :, 0] = [[10], [15]]
-        self.u = np.zeros(self.N)
+    def __init__(self, N=100, F=10.0, Q=9, A=1, B=1, R=15, x_0=10,
+                 is_finite=True, eps=0.0001):
+        self.N = N
+        self.F = F
+        self.Q = Q
+        self.A = A
+        self.K = [self.F]
+        self.B = B
+        self.R = R
+        self.x = [x_0]
+        self.u = []
         self.J = 0
+        self.is_finite = is_finite
+        self.eps = eps
+        self.number_of_iterations = N
 
     def calculate_k(self):
-        for i in range(self.N - 2, -1, -1):
-            self.K[:, :, i] = self.A.transpose() @ (self.K[:, :, i + 1] -
-                              self.K[:, :, i + 1] @ self.B @ np.linalg.inv(
-                              self.R + self.B.transpose() @ self.K[:, :, i + 1]
-                              @ self.B) @ self.B.transpose() @
-                              self.K[:, :, i + 1]) @ self.A + self.Q
+        i = self.N - 2
+        while i > 0:
+            self.K.insert(0, self.A * (self.K[0] - self.K[0] * self.B *
+                                       (1/(self.R + self.B * self.K[0] *
+                                           self.B)) * self.B * self.K[0]) *
+                          self.A + self.Q)
+
+            if not self.is_finite:
+                if abs(self.K[0] - self.K[1]) < self.eps:
+                    self.number_of_iterations = self.N - i
+                    break
+            i -= 1
 
     def calculate_performance_index(self):
-        self.J = 0.5 * self.dupa[:, :, 0].transpose() @ self.K[:, :, 1] @ \
-                 self.dupa[:, :, 0]
+        self.J = 0.5 * self.x[0] * self.K[1] * self.x[0]
 
     def calculate_control_and_state(self):
-        for i in range(self.N - 1):
-            self.u[i] = -np.linalg.inv(self.R + self.B.transpose() @
-                        self.K[:, :, i + 1] @ self.B) @ self.B.transpose() @ \
-                        self.K[:, :, i + 1] @ self.A @ self.dupa[:, :, i]
-            # J = J + 0.5 * ((3 * x[0, :, i] - 6 * x[1, :, i]) ** 2 + 15 * u[i] ** 2)
-            self.dupa[:, :, i + 1] = self.A @ self.dupa[:, :, i] + self.B * self.u[i]
+        for i in range(self.number_of_iterations - 2):
+            self.u.append(-(1/(self.R + self.B *
+                        self.K[i + 1] * self.B)) * self.B * self.K[i + 1] *
+                        self.A * self.x[i])
+            self.x.append(self.A * self.x[i] + self.B * self.u[i])
+

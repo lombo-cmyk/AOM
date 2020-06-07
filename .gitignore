@@ -3,3 +3,6 @@
 *.zip
 *.exe
 *.png
+**/.idea/*
+.idea/*
+**/__pycache__/*

@@ -1,7 +1,7 @@
 from linearquadratic import LinearQuadraticProblem as LQP
 
 def main():
-    _is_finite = False
+    _is_finite = True
     for _Q in [3, 6, 9]:
         for _R in [2, 7, 11]:
                 problem = LQP(Q=_Q, R=_R, is_finite = _is_finite)

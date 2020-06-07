@@ -19,6 +19,7 @@ class LinearQuadraticProblem:
         self.is_finite = is_finite
         self.eps = eps
         self.no_of_iterations = N
+        self.eigen = []
 
     def calculate_k(self):
         i = self.N - 2
@@ -39,13 +40,16 @@ class LinearQuadraticProblem:
 
     def calculate_control_and_state(self):
         for i in range(self.no_of_iterations - 2):
-            self.u.append(-(1/(self.R + self.B * self.K[i + 1] * self.B)) *
-                          self.B * self.K[i + 1] * self.A * self.x[i])
+            temp = -(1/(self.R + self.B * self.K[i + 1] * self.B)) * self.B * \
+                   self.K[i + 1]
+            self.u.append(temp * self.A * self.x[i])
             self.x.append(self.A * self.x[i] + self.B * self.u[i])
+            self.eigen.append((1+temp)/self.A)
         self.u.append(-(1 / (self.R + self.B * self.K[self.no_of_iterations - 2]
                              * self.B)) * self.B *
                       self.K[self.no_of_iterations - 2] * self.A *
                       self.x[self.no_of_iterations - 2])
+        print(self.eigen)
 
     def plot_results(self):
         plt.subplot(121)
